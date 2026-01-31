@@ -1,6 +1,16 @@
 import { type ReactNode, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { DataContext, type Video } from '../hooks/useData';
-import data from '../data.json';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+async function fetchVideos(): Promise<Video[]> {
+  const response = await fetch(`${API_URL}/api/videos`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch videos');
+  }
+  return response.json();
+}
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -12,12 +22,15 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const videos = data as Video[];
+  const { data: videos = [], isLoading, error } = useQuery({
+    queryKey: ['videos'],
+    queryFn: fetchVideos,
+  });
 
   const randomSortedShorts = useMemo(() => shuffleArray(videos), [videos]);
 
   return (
-    <DataContext.Provider value={{ videos, randomSortedShorts }}>
+    <DataContext.Provider value={{ videos, randomSortedShorts, isLoading, error }}>
       {children}
     </DataContext.Provider>
   );

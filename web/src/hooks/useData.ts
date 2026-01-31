@@ -10,6 +10,8 @@ export interface Video {
 export interface DataContextType {
   videos: Video[];
   randomSortedShorts: Video[];
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export const DataContext = createContext<DataContextType | undefined>(undefined);
