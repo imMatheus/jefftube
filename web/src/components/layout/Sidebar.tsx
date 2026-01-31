@@ -3,7 +3,6 @@ import { cn } from "../../utils";
 import {
   HomeIcon,
   ShortsIcon,
-  ChevronDownIcon,
   ChevronRightIcon,
   HistoryIcon,
   PlaylistIcon,
@@ -11,11 +10,6 @@ import {
   LikedVideosIcon,
   YourVideosIcon,
   DownloadIcon,
-  MusicIcon,
-  MoviesIcon,
-  LiveIcon,
-  JTubePremiumIcon,
-  JTubeStudioIcon,
 } from "../icons";
 
 interface SidebarItemProps {
@@ -142,20 +136,8 @@ export function SidebarContent({ onItemClick }: SidebarContentProps) {
         onClick={onItemClick}
       />
 
-      <div className="border-t border-(--color-border-light) my-3" />
 
-      {/* More from JTube */}
-      <SectionHeader title="More from JTube" />
-      <SidebarItem
-        icon={<JTubePremiumIcon />}
-        label="JTube Premium"
-        onClick={onItemClick}
-      />
-      <SidebarItem
-        icon={<JTubeStudioIcon />}
-        label="JTube Studio"
-        onClick={onItemClick}
-      />
+
     </nav>
   );
 }

@@ -8,10 +8,16 @@ interface ChannelInfoProps {
   subscribers: string;
   videoCount: number;
   description: string;
-  links?: { label: string; url: string }[];
   avatar?: string;
   verified?: boolean;
 }
+
+const links = [
+  {
+    label: "jmail.world",
+    url: "https://jmail.world",
+  },
+];
 
 export function ChannelInfo({
   name,
@@ -19,7 +25,6 @@ export function ChannelInfo({
   subscribers,
   videoCount,
   description,
-  links = [],
   avatar,
   verified = false,
 }: ChannelInfoProps) {
@@ -46,14 +51,16 @@ export function ChannelInfo({
         </div>
         <p className="text-sm text-(--color-text-secondary) mt-2 line-clamp-1">
           {description}
-          <button className="text-(--color-text-primary) ml-1 font-medium">
+          {/* <button className="text-(--color-text-primary) ml-1 font-medium">
             ...more
-          </button>
+          </button> */}
         </p>
         {links.length > 0 && (
           <div className="flex items-center gap-1 text-sm mt-1">
             <a
               href={links[0].url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-(--color-link) hover:opacity-80"
             >
               {links[0].label}
@@ -70,7 +77,6 @@ export function ChannelInfo({
             Subscribed
             <ChevronDownIcon />
           </Button>
-          <Button variant="secondary">Join</Button>
         </div>
       </div>
     </div>

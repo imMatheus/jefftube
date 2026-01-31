@@ -32,20 +32,6 @@ export function ChannelPage() {
           videoCount={videos.length}
           description="Official Jeffery Epstein youtube channel."
           avatar="https://assets.getkino.com/photos/EFTA00003692-0.png"
-          links={[
-            {
-              label: "twitch.tv/jefferyepstein",
-              url: "https://twitch.tv/jefferyepstein",
-            },
-            {
-              label: "twitter.com/jefferyepstein",
-              url: "https://twitter.com/jefferyepstein",
-            },
-            {
-              label: "discord.gg/jefferyepstein",
-              url: "https://discord.gg/jefferyepstein",
-            },
-          ]}
           verified
         />
 

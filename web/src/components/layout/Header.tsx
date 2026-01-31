@@ -10,7 +10,6 @@ import {
   MenuIcon,
   JTubeLogo,
   SearchIcon,
-  NotificationIcon,
   KeyboardIcon,
   QuestionIcon,
 } from "../icons";
@@ -53,9 +52,6 @@ export function Header() {
 
         {/* Right section */}
         <div className="flex items-center gap-2">
-          <IconButton ariaLabel="Notifications">
-            <NotificationIcon />
-          </IconButton>
           <IconButton ariaLabel="What is this?" onClick={() => setIsInfoModalOpen(true)}>
             <QuestionIcon />
           </IconButton>
