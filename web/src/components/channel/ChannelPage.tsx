@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { ChannelBanner } from './ChannelBanner';
 import { ChannelInfo } from './ChannelInfo';
 import { ChannelTabs } from './ChannelTabs';
-import { FeaturedVideo } from './FeaturedVideo';
 import { VideoCard } from '../ui/VideoCard';
 import { VideoCarousel } from '../ui/VideoCarousel';
+import { useData } from '../../hooks/useData';
+import { getThumbnailUrl } from '../../utils/thumbnail';
 
 const channelTabs = [
   { id: 'home', label: 'Home' },
@@ -14,26 +15,12 @@ const channelTabs = [
   { id: 'community', label: 'Community' },
 ];
 
-const recentVideos = [
-  { title: 'Overwatch', duration: '26:50', views: '93,737', uploadedAt: '10 hours ago' },
-  { title: 'The Highguard Disaster', duration: '23:02', views: '124,095', uploadedAt: '2 days ago' },
-  { title: "I'm going feral for her..", duration: '17:37', views: '93,774', uploadedAt: '4 days ago' },
-  { title: 'Twitch is trolling me..', duration: '19:43', views: '165,243', uploadedAt: '8 days ago' },
-  { title: 'I hosted a $200k Marvel Rivals tournament', duration: '1:18:29', views: '125,464', uploadedAt: '11 days ago' },
-  { title: 'What playing Overwatch feels like rn', duration: '16:24', views: '167,465', uploadedAt: '2 weeks ago' },
-];
-
-const classicsVideos = [
-  { title: 'Best of supertf 2022', duration: '1:45:23', views: '234,567', uploadedAt: '1 year ago' },
-  { title: 'The Silver Experience', duration: '32:15', views: '456,789', uploadedAt: '2 years ago' },
-  { title: 'When chat takes control', duration: '28:42', views: '189,234', uploadedAt: '1 year ago' },
-  { title: 'Rank 1 to Bronze speedrun', duration: '45:18', views: '567,890', uploadedAt: '2 years ago' },
-  { title: 'The ultimate compilations', duration: '52:33', views: '321,654', uploadedAt: '1 year ago' },
-  { title: 'Chat creates my loadout', duration: '38:27', views: '245,678', uploadedAt: '2 years ago' },
-];
-
 export function ChannelPage() {
   const [activeTab, setActiveTab] = useState('home');
+  const { videos } = useData();
+
+  const recentVideos = videos.slice(0, 12);
+  const olderVideos = videos.slice(12, 24);
 
   return (
     <main className="ml-60 pt-14 min-h-screen bg-(--color-bg-primary)">
@@ -44,7 +31,7 @@ export function ChannelPage() {
           name="Jeffery Epstein"
           handle="@jefferyepstein"
           subscribers="392K"
-          videoCount={628}
+          videoCount={videos.length}
           description="Official Jeffery Epstein youtube channel."
           avatar="https://assets.getkino.com/photos/EFTA00003692-0.png"
           links={[
@@ -63,50 +50,55 @@ export function ChannelPage() {
 
         {activeTab === 'home' && (
           <div className="py-6 space-y-8">
-            {/* Featured Video */}
-            <FeaturedVideo
-              title="WORST of supertf 2023!"
-              channel="supertf"
-              duration="1:22:13"
-              views="1M"
-              uploadedAt="2 years ago"
-              description="That time of year again. Clips channel: https://www.youtube.com/channel/UCfLUpsmJ3v99NEbLTE9Ozng VOD channel (If you can't catch the streams): https://www.youtube.com/c/supertfVODs Socials:..."
-              verified
-            />
+            {/* Recent Videos */}
+            <VideoCarousel title="Videos">
+              {recentVideos.map((video) => (
+                <VideoCard
+                  key={video.id}
+                  thumbnail={getThumbnailUrl(video.id)}
+                  title={video.title}
+                  duration={video.length}
+                  views="1.2K"
+                  uploadedAt="2 days ago"
+                  size="md"
+                />
+              ))}
+            </VideoCarousel>
 
             <div className="border-t border-(--color-border-light)" />
 
-            {/* Videos Section */}
-            <VideoCarousel title="Videos">
-              {recentVideos.map((video, index) => (
+            {/* More Videos */}
+            <VideoCarousel title="More videos" showPlayAll>
+              {olderVideos.map((video) => (
                 <VideoCard
-                  key={index}
+                  key={video.id}
+                  thumbnail={getThumbnailUrl(video.id)}
                   title={video.title}
-                  duration={video.duration}
-                  views={video.views}
-                  uploadedAt={video.uploadedAt}
+                  duration={video.length}
+                  views="856"
+                  uploadedAt="1 week ago"
                   size="md"
                 />
               ))}
             </VideoCarousel>
+          </div>
+        )}
 
-            {/* Playlist Section */}
-            <VideoCarousel
-              title="supertf classics"
-              showPlayAll
-              subtitle="Best supertf videos"
-            >
-              {classicsVideos.map((video, index) => (
+        {activeTab === 'videos' && (
+          <div className="py-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {videos.map((video) => (
                 <VideoCard
-                  key={index}
+                  key={video.id}
+                  thumbnail={getThumbnailUrl(video.id)}
                   title={video.title}
-                  duration={video.duration}
-                  views={video.views}
-                  uploadedAt={video.uploadedAt}
-                  size="md"
+                  duration={video.length}
+                  views="1.2K"
+                  uploadedAt="2 days ago"
+                  size="lg"
                 />
               ))}
-            </VideoCarousel>
+            </div>
           </div>
         )}
       </div>

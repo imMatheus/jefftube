@@ -1,8 +1,8 @@
-import { ThemeProvider } from './contexts/ThemeContext';
-import { DataProvider } from './contexts/DataContext';
-import { Header } from './components/layout/Header';
-import { Sidebar } from './components/layout/Sidebar';
-import { ChannelPage } from './components/channel/ChannelPage';
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { DataProvider } from "./contexts/DataContext";
+import { Header } from "./components/layout/Header";
+import { Sidebar } from "./components/layout/Sidebar";
+import { ChannelPage } from "./components/channel/ChannelPage";
 
 function App() {
   return (
