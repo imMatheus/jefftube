@@ -5,6 +5,7 @@ export const videos = pgTable("videos", {
   title: varchar("title", { length: 255 }),
   filename: varchar("filename", { length: 255 }).notNull(),
   length: integer("length").notNull(),
+  views: integer("views").notNull().default(0),
 });
 
 export type Video = typeof videos.$inferSelect;

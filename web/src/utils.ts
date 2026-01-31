@@ -25,3 +25,18 @@ export const formatDuration = (seconds: number): string => {
   }
   return `${minutes}:${secs.toString().padStart(2, "0")}`;
 };
+
+/**
+ * Formats a view count into a human-readable string.
+ * @param views - The number of views.
+ * @returns A formatted view count string (e.g., "1.2K", "3.5M").
+ */
+export const formatViews = (views: number): string => {
+  if (views >= 1_000_000) {
+    return `${(views / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  }
+  if (views >= 1_000) {
+    return `${(views / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  }
+  return views.toString();
+};

@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import type { Video } from "../../hooks/useData";
 import { getThumbnailUrl } from "../../utils/thumbnail";
-import { formatDuration } from "../../utils";
+import { formatDuration, formatViews } from "../../utils";
 import { MoreVertIcon } from "../icons";
 
 interface VideoSidebarProps {
@@ -39,7 +39,7 @@ function SidebarVideoCard({ video }: SidebarVideoCardProps) {
         </div>
         <p className="text-xs text-(--color-text-secondary) mt-1">Jeffery Epstein</p>
         <div className="flex items-center gap-1 text-xs text-(--color-text-secondary)">
-          <span>1.2K views</span>
+          <span>{formatViews(video.views)} views</span>
           <span>•</span>
           <span>2 days ago</span>
         </div>
@@ -50,7 +50,7 @@ function SidebarVideoCard({ video }: SidebarVideoCardProps) {
 
 export function VideoSidebar({ videos }: VideoSidebarProps) {
   return (
-    <aside className="w-full lg:w-[400px] flex-shrink-0">
+    <aside className="w-full lg:w-[400px] shrink-0">
       {/* Filter chips */}
       <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-none pb-2">
         <button className="px-3 py-1.5 bg-(--color-text-primary) text-(--color-bg-primary) rounded-lg text-sm font-medium whitespace-nowrap">

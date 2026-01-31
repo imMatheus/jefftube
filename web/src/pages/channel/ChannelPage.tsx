@@ -6,8 +6,6 @@ import { ChannelTabs } from "./ChannelTabs";
 import { VideoCard } from "../../components/ui/VideoCard";
 import { VideoCarousel } from "../../components/ui/VideoCarousel";
 import { useData } from "../../hooks/useData";
-import { getThumbnailUrl } from "../../utils/thumbnail";
-
 
 export function ChannelPage() {
   const [activeTab, setActiveTab] = useState("home");
@@ -41,16 +39,7 @@ export function ChannelPage() {
             {/* Recent Videos */}
             <VideoCarousel title="Videos">
               {recentVideos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  videoId={video.id}
-                  thumbnail={getThumbnailUrl(video.filename)}
-                  title={video.title}
-                  duration={video.length}
-                  views="1.2K"
-                  uploadedAt="2 days ago"
-                  size="md"
-                />
+                <VideoCard key={video.id} video={video} />
               ))}
             </VideoCarousel>
 
@@ -59,16 +48,7 @@ export function ChannelPage() {
             {/* More Videos */}
             <VideoCarousel title="More videos" showPlayAll>
               {olderVideos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  videoId={video.id}
-                  thumbnail={getThumbnailUrl(video.filename)}
-                  title={video.title}
-                  duration={video.length}
-                  views="856"
-                  uploadedAt="1 week ago"
-                  size="md"
-                />
+                <VideoCard key={video.id} video={video} />
               ))}
             </VideoCarousel>
           </div>
@@ -78,16 +58,7 @@ export function ChannelPage() {
           <div className="py-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {videos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  videoId={video.id}
-                  thumbnail={getThumbnailUrl(video.filename)}
-                  title={video.title}
-                  duration={video.length}
-                  views="1.2K"
-                  uploadedAt="2 days ago"
-                  size="lg"
-                />
+                <VideoCard key={video.id} video={video} size="lg" />
               ))}
             </div>
           </div>

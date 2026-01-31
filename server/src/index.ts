@@ -1,3 +1,4 @@
+import { desc, eq, sql } from "drizzle-orm";
 import { db } from "./db";
 import { videos } from "./db/schema";
 
@@ -18,10 +19,31 @@ const server = Bun.serve({
       return new Response(null, { headers: corsHeaders });
     }
 
-    // GET /api/videos - return all videos
+    // GET /api/videos - return all videos sorted by most views
     if (url.pathname === "/api/videos" && req.method === "GET") {
-      const allVideos = await db.select().from(videos);
+      const allVideos = await db.select().from(videos).orderBy(desc(videos.views));
       return Response.json(allVideos, { headers: corsHeaders });
+    }
+
+    // POST /api/videos/:id/view - increment view count
+    const viewMatch = url.pathname.match(/^\/api\/videos\/([^/]+)\/view$/);
+    if (viewMatch && req.method === "POST") {
+      const videoId = viewMatch[1];
+
+      const result = await db
+        .update(videos)
+        .set({ views: sql`${videos.views} + 1` })
+        .where(eq(videos.id, videoId))
+        .returning();
+
+      if (result.length === 0) {
+        return Response.json(
+          { error: "Video not found" },
+          { status: 404, headers: corsHeaders }
+        );
+      }
+
+      return Response.json({ views: result[0].views }, { headers: corsHeaders });
     }
 
     // 404 for other routes

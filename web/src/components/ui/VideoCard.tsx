@@ -1,19 +1,13 @@
 import { Link } from "react-router";
-import { cn, formatDuration } from "../../utils";
+import type { Video } from "../../hooks/useData";
+import { cn, formatDuration, formatViews } from "../../utils";
+import { getThumbnailUrl } from "../../utils/thumbnail";
 import { MoreVertIcon, VerifiedIcon } from "../icons";
 
 interface VideoCardProps {
-  videoId: string;
-  thumbnail?: string;
-  duration: number;
-  title: string;
-  channel?: string;
-  channelAvatar?: string;
-  views: string;
-  uploadedAt: string;
+  video: Video;
   showChannel?: boolean;
   size?: "sm" | "md" | "lg";
-  verified?: boolean;
 }
 
 const sizeClasses = {
@@ -23,66 +17,55 @@ const sizeClasses = {
 };
 
 export function VideoCard({
-  videoId,
-  thumbnail,
-  duration,
-  title,
-  channel,
-  views,
-  uploadedAt,
+  video,
   showChannel = false,
   size = "md",
-  verified = false,
 }: VideoCardProps) {
+  const thumbnail = getThumbnailUrl(video.filename);
+
   return (
     <Link
-      to={`/watch/${videoId}`}
-      className={cn("group flex-shrink-0 block", sizeClasses[size])}
+      to={`/watch/${video.id}`}
+      className={cn("group shrink-0 block", sizeClasses[size])}
     >
       <div className="relative aspect-video bg-(--color-bg-tertiary) rounded-xl overflow-hidden mb-2">
-        {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-(--color-bg-secondary) to-(--color-bg-tertiary) flex items-center justify-center">
-            <div className="w-12 h-12 bg-(--color-bg-hover) rounded-lg" />
-          </div>
-        )}
+        <img
+          src={thumbnail}
+          alt={video.title}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute bottom-1 right-1 bg-(--color-overlay) text-white text-xs px-1 py-0.5 rounded font-medium">
-          {formatDuration(duration)}
+          {formatDuration(video.length)}
         </div>
       </div>
       <div className="flex gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-1">
             <h3 className="text-sm font-medium text-(--color-text-primary) line-clamp-2 leading-5">
-              {title}
+              {video.title}
             </h3>
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
               }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1 -mr-1 hover:bg-(--color-bg-hover) rounded-full"
+              className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 p-1 -mr-1 hover:bg-(--color-bg-hover) rounded-full"
             >
               <MoreVertIcon />
             </button>
           </div>
-          {showChannel && channel && (
+          {showChannel && (
             <div className="flex items-center gap-1 mt-1">
               <span className="text-xs text-(--color-text-secondary) hover:text-(--color-text-primary) cursor-pointer">
-                {channel}
+                Jeffery Epstein
               </span>
-              {verified && <VerifiedIcon />}
+              <VerifiedIcon />
             </div>
           )}
           <div className="flex items-center gap-1 text-xs text-(--color-text-secondary) mt-0.5">
-            <span>{views} views</span>
+            <span>{formatViews(video.views)} views</span>
             <span>•</span>
-            <span>{uploadedAt}</span>
+            <span>2 days ago</span>
           </div>
         </div>
       </div>

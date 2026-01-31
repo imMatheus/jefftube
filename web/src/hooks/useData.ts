@@ -5,6 +5,7 @@ export interface Video {
   title: string;
   filename: string;
   length: number;
+  views: number;
 }
 
 export interface DataContextType {
@@ -12,6 +13,7 @@ export interface DataContextType {
   randomSortedShorts: Video[];
   isLoading: boolean;
   error: Error | null;
+  trackView: (videoId: string) => Promise<void>;
 }
 
 export const DataContext = createContext<DataContextType | undefined>(undefined);

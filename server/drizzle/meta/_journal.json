@@ -15,6 +15,13 @@
       "when": 1769894895363,
       "tag": "0001_robust_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769895389228,
+      "tag": "0002_light_veda",
+      "breakpoints": true
     }
   ]
 }

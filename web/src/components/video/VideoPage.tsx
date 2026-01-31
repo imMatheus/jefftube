@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import { CHANNEL_AVATAR_URL } from "../../constants";
 import { Header } from "../layout/Header";
@@ -6,13 +7,23 @@ import { VideoInfo } from "./VideoInfo";
 import { VideoSidebar } from "./VideoSidebar";
 import { useData } from "../../hooks/useData";
 import { getVideoUrl, getThumbnailUrl } from "../../utils/thumbnail";
+import { formatViews } from "../../utils";
 
 export function VideoPage() {
   const { videoId } = useParams<{ videoId: string }>();
-  const { videos } = useData();
+  const { videos, trackView } = useData();
+  const trackedVideoId = useRef<string | null>(null);
 
   const video = videos.find((v) => v.id === videoId);
   const suggestedVideos = videos.filter((v) => v.id !== videoId).slice(0, 500);
+
+  // Track view when video page is loaded (only once per video)
+  useEffect(() => {
+    if (videoId && trackedVideoId.current !== videoId) {
+      trackedVideoId.current = videoId;
+      trackView(videoId);
+    }
+  }, [videoId, trackView]);
 
   if (!video) {
     return (
@@ -38,7 +49,7 @@ export function VideoPage() {
             />
             <VideoInfo
               title={video.title}
-              views="174,908"
+              views={formatViews(video.views)}
               uploadedAt="4 months ago"
               channelName="Jeffery Epstein"
               channelAvatar={CHANNEL_AVATAR_URL}
