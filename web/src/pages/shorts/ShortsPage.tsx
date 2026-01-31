@@ -4,7 +4,7 @@ import { useData } from "../../hooks/useData";
 import { NavUpIcon, NavDownIcon } from "../../components/icons";
 
 export function ShortsPage() {
-  const { videos } = useData();
+  const { randomSortedShorts: videos } = useData();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
