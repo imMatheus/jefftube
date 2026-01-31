@@ -55,9 +55,7 @@ export function ChannelInfo({
         </div>
         <p className="text-xs sm:text-sm text-(--color-text-secondary) mt-1 sm:mt-2 line-clamp-1">
           {description}
-          <button className="text-(--color-text-primary) ml-1 font-medium">
-            ...more
-          </button>
+
         </p>
         {links.length > 0 && (
           <div className="flex items-center gap-1 text-xs sm:text-sm mt-1">
