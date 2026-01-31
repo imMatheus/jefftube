@@ -4,7 +4,7 @@ export interface Video {
   id: string;
   title: string;
   filename: string;
-  length: string;
+  length: number;
 }
 
 export interface DataContextType {

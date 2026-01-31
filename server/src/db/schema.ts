@@ -1,10 +1,10 @@
-import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, integer } from "drizzle-orm/pg-core";
 
 export const videos = pgTable("videos", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  title: varchar("title", { length: 255 }).notNull(),
+  id: uuid("id").primaryKey(),
+  title: varchar("title", { length: 255 }),
   filename: varchar("filename", { length: 255 }).notNull(),
-  length: varchar("length", { length: 20 }).notNull(),
+  length: integer("length").notNull(),
 });
 
 export type Video = typeof videos.$inferSelect;

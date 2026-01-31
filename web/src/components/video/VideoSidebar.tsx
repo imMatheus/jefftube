@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { Video } from "../../hooks/useData";
 import { getThumbnailUrl } from "../../utils/thumbnail";
+import { formatDuration } from "../../utils";
 import { MoreVertIcon } from "../icons";
 
 interface VideoSidebarProps {
@@ -24,7 +25,7 @@ function SidebarVideoCard({ video }: SidebarVideoCardProps) {
           className="w-full h-full object-cover"
         />
         <div className="absolute bottom-1 right-1 bg-(--color-overlay) text-white text-xs px-1 py-0.5 rounded font-medium">
-          {video.length}
+          {formatDuration(video.length)}
         </div>
       </div>
       <div className="flex-1 min-w-0">

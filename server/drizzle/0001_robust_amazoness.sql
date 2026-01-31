@@ -1,0 +1,1 @@
+ALTER TABLE "videos" ALTER COLUMN "length" SET DATA TYPE integer;

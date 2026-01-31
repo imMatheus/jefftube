@@ -9,7 +9,8 @@
     "db:stop": "docker compose down",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.38.0",

@@ -1,4 +1,5 @@
-import data from "./data.json";
+import { db } from "./db";
+import { videos } from "./db/schema";
 
 const server = Bun.serve({
   port: 3001,
@@ -19,7 +20,8 @@ const server = Bun.serve({
 
     // GET /api/videos - return all videos
     if (url.pathname === "/api/videos" && req.method === "GET") {
-      return Response.json(data, { headers: corsHeaders });
+      const allVideos = await db.select().from(videos);
+      return Response.json(allVideos, { headers: corsHeaders });
     }
 
     // 404 for other routes

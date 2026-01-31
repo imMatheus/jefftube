@@ -1,11 +1,11 @@
 import { Link } from "react-router";
-import { cn } from "../../utils";
+import { cn, formatDuration } from "../../utils";
 import { MoreVertIcon, VerifiedIcon } from "../icons";
 
 interface VideoCardProps {
   videoId: string;
   thumbnail?: string;
-  duration: string;
+  duration: number;
   title: string;
   channel?: string;
   channelAvatar?: string;
@@ -52,7 +52,7 @@ export function VideoCard({
           </div>
         )}
         <div className="absolute bottom-1 right-1 bg-(--color-overlay) text-white text-xs px-1 py-0.5 rounded font-medium">
-          {duration}
+          {formatDuration(duration)}
         </div>
       </div>
       <div className="flex gap-2">
