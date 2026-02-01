@@ -1,15 +1,15 @@
+import { Hono } from "hono";
 import { and, desc, eq, sql, isNull } from "drizzle-orm";
 import { db } from "../db";
 import { comments, commentLikes, users } from "../db/schema";
 import { getClientIp, getOrCreateUser } from "./users";
 
+export const commentsRoutes = new Hono();
+
 // GET /api/videos/:videoId/comments - get comments for a video
-export async function handleGetComments(
-  req: Request,
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+commentsRoutes.get("/videos/:videoId/comments", async (c) => {
+  const videoId = c.req.param("videoId");
+  const ip = getClientIp(c.req.raw);
   const currentUser = await getOrCreateUser(ip);
 
   // Get all top-level comments (no parent)
@@ -45,8 +45,8 @@ export async function handleGetComments(
   // Get like counts and user's likes for all comments
   const commentIds = [...topLevelComments, ...allReplies].map((c) => c.id);
 
-  let likeCounts: Record<string, { likes: number; dislikes: number }> = {};
-  let userLikes: Record<string, boolean | null> = {};
+  const likeCounts: Record<string, { likes: number; dislikes: number }> = {};
+  const userLikes: Record<string, boolean | null> = {};
 
   if (commentIds.length > 0) {
     // Get like/dislike counts
@@ -113,29 +113,20 @@ export async function handleGetComments(
 
   const totalCount = topLevelComments.length + allReplies.length;
 
-  return Response.json(
-    { comments: commentsWithReplies, totalCount },
-    { headers: corsHeaders }
-  );
-}
+  return c.json({ comments: commentsWithReplies, totalCount });
+});
 
 // POST /api/videos/:videoId/comments - create a comment
-export async function handlePostComment(
-  req: Request,
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+commentsRoutes.post("/videos/:videoId/comments", async (c) => {
+  const videoId = c.req.param("videoId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
-  const body = await req.json();
+  const body = await c.req.json();
   const { content, parentId } = body as { content: string; parentId?: string };
 
   if (!content || content.trim().length === 0) {
-    return Response.json(
-      { error: "Content is required" },
-      { status: 400, headers: corsHeaders }
-    );
+    return c.json({ error: "Content is required" }, 400);
   }
 
   const newComment = await db
@@ -148,7 +139,7 @@ export async function handlePostComment(
     })
     .returning();
 
-  return Response.json(
+  return c.json(
     {
       id: newComment[0].id,
       content: newComment[0].content,
@@ -162,17 +153,14 @@ export async function handlePostComment(
       userLike: null,
       replies: [],
     },
-    { status: 201, headers: corsHeaders }
+    201
   );
-}
+});
 
 // POST /api/comments/:commentId/like - like a comment
-export async function handleLikeComment(
-  req: Request,
-  commentId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+commentsRoutes.post("/comments/:commentId/like", async (c) => {
+  const commentId = c.req.param("commentId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
   // Check if user already has a reaction
@@ -193,14 +181,14 @@ export async function handleLikeComment(
       await db
         .delete(commentLikes)
         .where(eq(commentLikes.id, existing[0].id));
-      return Response.json({ userLike: null }, { headers: corsHeaders });
+      return c.json({ userLike: null });
     } else {
       // Was dislike, change to like
       await db
         .update(commentLikes)
         .set({ isLike: true })
         .where(eq(commentLikes.id, existing[0].id));
-      return Response.json({ userLike: true }, { headers: corsHeaders });
+      return c.json({ userLike: true });
     }
   }
 
@@ -211,16 +199,13 @@ export async function handleLikeComment(
     isLike: true,
   });
 
-  return Response.json({ userLike: true }, { headers: corsHeaders });
-}
+  return c.json({ userLike: true });
+});
 
 // POST /api/comments/:commentId/dislike - dislike a comment
-export async function handleDislikeComment(
-  req: Request,
-  commentId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+commentsRoutes.post("/comments/:commentId/dislike", async (c) => {
+  const commentId = c.req.param("commentId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
   // Check if user already has a reaction
@@ -241,14 +226,14 @@ export async function handleDislikeComment(
       await db
         .delete(commentLikes)
         .where(eq(commentLikes.id, existing[0].id));
-      return Response.json({ userLike: null }, { headers: corsHeaders });
+      return c.json({ userLike: null });
     } else {
       // Was like, change to dislike
       await db
         .update(commentLikes)
         .set({ isLike: false })
         .where(eq(commentLikes.id, existing[0].id));
-      return Response.json({ userLike: false }, { headers: corsHeaders });
+      return c.json({ userLike: false });
     }
   }
 
@@ -259,5 +244,5 @@ export async function handleDislikeComment(
     isLike: false,
   });
 
-  return Response.json({ userLike: false }, { headers: corsHeaders });
-}
+  return c.json({ userLike: false });
+});

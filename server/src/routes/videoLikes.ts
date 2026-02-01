@@ -1,15 +1,15 @@
+import { Hono } from "hono";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { videos, videoLikes } from "../db/schema";
 import { getClientIp, getOrCreateUser } from "./users";
 
+export const videoLikesRoutes = new Hono();
+
 // GET /api/videos/:videoId/like - get user's like status for a video
-export async function handleGetVideoLike(
-  req: Request,
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+videoLikesRoutes.get("/videos/:videoId/like", async (c) => {
+  const videoId = c.req.param("videoId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
   const existing = await db
@@ -23,19 +23,13 @@ export async function handleGetVideoLike(
     )
     .limit(1);
 
-  return Response.json(
-    { userLike: existing.length > 0 ? existing[0].isLike : null },
-    { headers: corsHeaders }
-  );
-}
+  return c.json({ userLike: existing.length > 0 ? existing[0].isLike : null });
+});
 
 // POST /api/videos/:videoId/like - like a video
-export async function handleLikeVideo(
-  req: Request,
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+videoLikesRoutes.post("/videos/:videoId/like", async (c) => {
+  const videoId = c.req.param("videoId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
   // Check if user already has a reaction
@@ -54,15 +48,11 @@ export async function handleLikeVideo(
     if (existing[0].isLike) {
       // Already liked, remove the like
       await db.delete(videoLikes).where(eq(videoLikes.id, existing[0].id));
-      await db
-        .update(videos)
-        .set({ likes: videos.likes })
-        .where(eq(videos.id, videoId));
       // Decrement likes count
       await db.execute(
         `UPDATE videos SET likes = likes - 1 WHERE id = '${videoId}'`
       );
-      return Response.json({ userLike: null }, { headers: corsHeaders });
+      return c.json({ userLike: null });
     } else {
       // Was dislike, change to like
       await db
@@ -73,7 +63,7 @@ export async function handleLikeVideo(
       await db.execute(
         `UPDATE videos SET likes = likes + 1, dislikes = dislikes - 1 WHERE id = '${videoId}'`
       );
-      return Response.json({ userLike: true }, { headers: corsHeaders });
+      return c.json({ userLike: true });
     }
   }
 
@@ -88,16 +78,13 @@ export async function handleLikeVideo(
     `UPDATE videos SET likes = likes + 1 WHERE id = '${videoId}'`
   );
 
-  return Response.json({ userLike: true }, { headers: corsHeaders });
-}
+  return c.json({ userLike: true });
+});
 
 // POST /api/videos/:videoId/dislike - dislike a video
-export async function handleDislikeVideo(
-  req: Request,
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
-  const ip = getClientIp(req);
+videoLikesRoutes.post("/videos/:videoId/dislike", async (c) => {
+  const videoId = c.req.param("videoId");
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
 
   // Check if user already has a reaction
@@ -120,7 +107,7 @@ export async function handleDislikeVideo(
       await db.execute(
         `UPDATE videos SET dislikes = dislikes - 1 WHERE id = '${videoId}'`
       );
-      return Response.json({ userLike: null }, { headers: corsHeaders });
+      return c.json({ userLike: null });
     } else {
       // Was like, change to dislike
       await db
@@ -131,7 +118,7 @@ export async function handleDislikeVideo(
       await db.execute(
         `UPDATE videos SET likes = likes - 1, dislikes = dislikes + 1 WHERE id = '${videoId}'`
       );
-      return Response.json({ userLike: false }, { headers: corsHeaders });
+      return c.json({ userLike: false });
     }
   }
 
@@ -146,5 +133,5 @@ export async function handleDislikeVideo(
     `UPDATE videos SET dislikes = dislikes + 1 WHERE id = '${videoId}'`
   );
 
-  return Response.json({ userLike: false }, { headers: corsHeaders });
-}
+  return c.json({ userLike: false });
+});

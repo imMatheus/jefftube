@@ -1,18 +1,20 @@
+import { Hono } from "hono";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { videos } from "../db/schema";
 
+export const videosRoutes = new Hono();
+
 // GET /api/videos - return all videos sorted by most views
-export async function handleGetVideos(corsHeaders: Record<string, string>) {
+videosRoutes.get("/videos", async (c) => {
   const allVideos = await db.select().from(videos).orderBy(desc(videos.views));
-  return Response.json(allVideos, { headers: corsHeaders });
-}
+  return c.json(allVideos);
+});
 
 // POST /api/videos/:id/view - increment view count
-export async function handlePostView(
-  videoId: string,
-  corsHeaders: Record<string, string>
-) {
+videosRoutes.post("/videos/:id/view", async (c) => {
+  const videoId = c.req.param("id");
+
   const result = await db
     .update(videos)
     .set({ views: sql`${videos.views} + 1` })
@@ -20,11 +22,8 @@ export async function handlePostView(
     .returning();
 
   if (result.length === 0) {
-    return Response.json(
-      { error: "Video not found" },
-      { status: 404, headers: corsHeaders }
-    );
+    return c.json({ error: "Video not found" }, 404);
   }
 
-  return Response.json({ views: result[0].views }, { headers: corsHeaders });
-}
+  return c.json({ views: result[0].views });
+});

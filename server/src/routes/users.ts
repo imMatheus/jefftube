@@ -1,6 +1,9 @@
+import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
+
+export const usersRoutes = new Hono();
 
 // Generate a random username like @user-a7f3b2
 function generateUsername(): string {
@@ -62,11 +65,8 @@ export function getClientIp(req: Request): string {
 }
 
 // GET /api/me - get current user
-export async function handleGetMe(req: Request, corsHeaders: Record<string, string>) {
-  const ip = getClientIp(req);
+usersRoutes.get("/me", async (c) => {
+  const ip = getClientIp(c.req.raw);
   const user = await getOrCreateUser(ip);
-  return Response.json(
-    { id: user.id, username: user.username },
-    { headers: corsHeaders }
-  );
-}
+  return c.json({ id: user.id, username: user.username });
+});
