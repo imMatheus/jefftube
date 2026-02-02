@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
+import { Helmet } from "react-helmet-async";
 import { Header } from "../layout/Header";
 import { VideoPlayer } from "./VideoPlayer";
 import { VideoInfo } from "./VideoInfo";
@@ -37,6 +38,14 @@ export function VideoPage() {
 
   return (
     <div className="min-h-screen bg-(--color-bg-primary) text-(--color-text-primary)">
+      <Helmet>
+        <title>{video.title} - JTube</title>
+        <meta name="description" content={`Watch ${video.title} on JTube`} />
+        <meta property="og:title" content={`${video.title} - JTube`} />
+        <meta property="og:description" content={`Watch ${video.title} on JTube`} />
+        <meta property="og:type" content="video.other" />
+        <meta property="og:image" content={getThumbnailUrl(video.filename)} />
+      </Helmet>
       <Header />
       <main className="pt-14 px-4">
         <div className="max-w-[1800px] mx-auto flex flex-col lg:flex-row gap-6 py-6">

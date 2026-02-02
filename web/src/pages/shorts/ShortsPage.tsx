@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import { ShortVideo } from "./ShortVideo";
 import { useData } from "../../hooks/useData";
 import { NavUpIcon, NavDownIcon } from "../../components/icons";
@@ -53,6 +54,13 @@ export function ShortsPage() {
 
   return (
     <>
+      <Helmet>
+        <title>Shorts - JTube</title>
+        <meta name="description" content="Watch short videos on JTube" />
+        <meta property="og:title" content="Shorts - JTube" />
+        <meta property="og:description" content="Watch short videos on JTube" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <main
         ref={containerRef}
         className="lg:ml-60 mt-14 h-[calc(100vh-56px)] overflow-y-scroll snap-y snap-mandatory scrollbar-hide"

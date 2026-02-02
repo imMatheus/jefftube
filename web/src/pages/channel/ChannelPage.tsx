@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { CHANNEL_AVATAR_URL, CHANNEL_BANNER_URL } from "../../constants";
 import { ChannelBanner } from "./ChannelBanner";
 import { ChannelInfo } from "./ChannelInfo";
@@ -15,7 +16,15 @@ export function ChannelPage() {
   const olderVideos = videos.slice(12, 24);
 
   return (
-    <main className="md:ml-60 pt-14 min-h-screen bg-(--color-bg-primary)">
+    <>
+      <Helmet>
+        <title>Jeffery Epstein - JTube</title>
+        <meta name="description" content="Official Jeffery Epstein JTube channel. Watch the latest videos and subscribe for more content." />
+        <meta property="og:title" content="Jeffery Epstein - JTube" />
+        <meta property="og:description" content="Official Jeffery Epstein JTube channel." />
+        <meta property="og:type" content="profile" />
+      </Helmet>
+      <main className="md:ml-60 pt-14 min-h-screen bg-(--color-bg-primary)">
       <div className="max-w-[1284px] mx-auto px-4 md:px-6 py-4">
         <ChannelBanner src={CHANNEL_BANNER_URL} />
 
@@ -65,5 +74,6 @@ export function ChannelPage() {
         )}
       </div>
     </main>
+    </>
   );
 }

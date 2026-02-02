@@ -1,10 +1,16 @@
 import { Link } from "react-router";
+import { Helmet } from "react-helmet-async";
 import { Header } from "./layout/Header";
 import { Sidebar } from "./layout/Sidebar";
 
 export function NotFoundPage() {
   return (
     <div className="min-h-screen bg-(--color-bg-primary) text-(--color-text-primary)">
+      <Helmet>
+        <title>Page Not Found - JTube</title>
+        <meta name="description" content="This page isn't available on JTube" />
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <Header />
       <Sidebar />
       <main className="pt-14 pl-0 md:pl-60">
