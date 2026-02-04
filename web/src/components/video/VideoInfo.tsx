@@ -29,14 +29,12 @@ export function VideoInfo({ video }: VideoInfoProps) {
 
   return (
     <div className="py-3">
-      {/* Title */}
       <h1 className="text-xl font-semibold text-(--color-text-primary) mb-3">
         {video.title}
       </h1>
 
-      {/* Channel info and actions */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        {/* Channel */}
+
         <div className="flex items-center gap-3">
           <Link to="/">
             <Avatar src={CHANNEL_AVATAR_URL} size="md" />
