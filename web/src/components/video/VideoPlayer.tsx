@@ -10,6 +10,7 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
         className="w-full h-full"
         controls
         autoPlay
+        playsInline
         poster={poster}
         src={src}
       >

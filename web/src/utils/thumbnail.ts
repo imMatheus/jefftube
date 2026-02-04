@@ -1,6 +1,6 @@
 import type { Video } from "../hooks/useData";
 
-const ASSETS_BASE_URL = "https://storage.cloud.google.com/jefftube";
+const ASSETS_BASE_URL = "https://storage.googleapis.com/jefftube/";
 
 export function getThumbnailUrl(video: Video): string {
   if (video.hasThumbnail) {
