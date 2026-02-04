@@ -5,6 +5,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { ChannelPage } from "./pages/channel/ChannelPage";
 import { VideoPage } from "./components/video/VideoPage";
 import { ShortsPage } from "./pages/shorts/ShortsPage";
+import { PlaylistVideoPage } from "./pages/playlist/PlaylistVideoPage";
 import { NotFoundPage } from "./components/NotFoundPage";
 import { useData } from "./hooks/useData";
 import { usePostHogIdentify } from "./hooks/usePostHogIdentify";
@@ -58,6 +59,7 @@ function App() {
         <Route path="/" element={<ChannelPage />} />
         <Route path="/watch/:videoId" element={<VideoPage />} />
         <Route path="/shorts" element={<ShortsPage />} />
+        <Route path="/playlist/:playlistId/:videoId" element={<PlaylistVideoPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

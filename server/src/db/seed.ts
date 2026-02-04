@@ -15,6 +15,7 @@ interface VideoStateEntry {
   filename: string;
   nsfw: boolean;
   is_shorts: boolean;
+  playlist: string | null;
 }
 
 // Create a lookup map from filename to video state
@@ -73,6 +74,7 @@ async function seed() {
           length: parseTimeToSeconds(video.length),
           hasThumbnail: video.hasThumbnail,
           is_shorts: state?.is_shorts ?? false,
+          playlist: state?.playlist ?? null,
         };
       })
     );

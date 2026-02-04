@@ -88,6 +88,11 @@
       color: white;
     }
 
+    .badge.playlist {
+      background-color: #f59e0b;
+      color: black;
+    }
+
     .loading {
       text-align: center;
       padding: 50px;
@@ -147,6 +152,21 @@
       background-color: #1d4ed8;
     }
 
+    .toolbar-btn.playlist {
+      background-color: #f59e0b;
+      color: black;
+    }
+
+    .toolbar-btn.playlist:hover {
+      background-color: #d97706;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background-color: #444;
+    }
+
     .toolbar-label {
       color: #888;
       font-size: 13px;
@@ -195,10 +215,66 @@
     .btn-copy.copied {
       background-color: #10b981;
     }
+
+    .top-left-panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stats {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stats-row span {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn-hide {
+      background-color: #6b7280;
+      color: white;
+    }
+
+    .btn-hide:hover {
+      background-color: #4b5563;
+    }
+
+    .btn-hide.active {
+      background-color: #ef4444;
+    }
+
+    .video-card.hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <button class="sticky-btn btn-copy" onclick="copyJsonState()">Copy JSON</button>
+  <div class="top-left-panel">
+    <button class="sticky-btn btn-copy" style="position:static" onclick="copyJsonState()">Copy JSON</button>
+    <div class="stats">
+      <div class="stats-row">
+        <div>NSFW: <span id="nsfw-count">0</span></div>
+        <div>Shorts: <span id="shorts-count">0</span></div>
+      </div>
+    </div>
+    <button class="sticky-btn btn-hide" style="position:static" onclick="toggleHideTagged()">Hide NSFW/Shorts</button>
+  </div>
   <button class="sticky-btn btn-deselect" onclick="deselectAll()">Deselect All</button>
 
   <h1>Video Debug Tool</h1>
@@ -210,6 +286,11 @@
     <span class="toolbar-label">Selected: <span id="selected-count" class="selected-count">0</span></span>
     <button class="toolbar-btn nsfw" onclick="toggleNsfw()">NSFW</button>
     <button class="toolbar-btn shorts" onclick="toggleShorts()">is_shorts</button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn playlist" onclick="setPlaylist('elevator-cam')">elevator</button>
+    <button class="toolbar-btn playlist" onclick="setPlaylist('cell-cam')">cell</button>
+    <button class="toolbar-btn playlist" onclick="setPlaylist('lobby-cam')">lobby</button>
+    <button class="toolbar-btn playlist" onclick="setPlaylist('person-cam')">person</button>
   </div>
 
   <script>
@@ -217,8 +298,9 @@
     const FALLBACK_THUMBNAIL = "https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/IDogLights2.JPG/250px-IDogLights2.JPG";
 
     // State management
-    const videoState = new Map(); // filename -> { nsfw: boolean, is_shorts: boolean }
+    const videoState = new Map(); // filename -> { nsfw: boolean, is_shorts: boolean, playlist: string|null }
     const selectedVideos = new Set(); // Set of filenames
+    let hideTagged = false;
 
     function getVideoUrl(filename) {
       return `${ASSETS_BASE_URL}/${filename}`;
@@ -231,6 +313,40 @@
 
     function updateSelectedCount() {
       document.getElementById('selected-count').textContent = selectedVideos.size;
+    }
+
+    function updateStats() {
+      let nsfwCount = 0;
+      let shortsCount = 0;
+      videoState.forEach(state => {
+        if (state.nsfw) nsfwCount++;
+        if (state.is_shorts) shortsCount++;
+      });
+      document.getElementById('nsfw-count').textContent = nsfwCount;
+      document.getElementById('shorts-count').textContent = shortsCount;
+    }
+
+    function toggleHideTagged() {
+      hideTagged = !hideTagged;
+      const btn = document.querySelector('.btn-hide');
+      btn.classList.toggle('active', hideTagged);
+      btn.textContent = hideTagged ? 'Show All' : 'Hide NSFW/Shorts';
+
+      document.querySelectorAll('.video-card').forEach(card => {
+        const filename = card.dataset.filename;
+        const state = videoState.get(filename);
+        if (state?.nsfw || state?.is_shorts) {
+          card.classList.toggle('hidden', hideTagged);
+        }
+      });
+    }
+
+    function updateCardVisibility(filename) {
+      if (!hideTagged) return;
+      const card = document.querySelector(`.video-card[data-filename="${filename}"]`);
+      if (!card) return;
+      const state = videoState.get(filename);
+      card.classList.toggle('hidden', state?.nsfw || state?.is_shorts);
     }
 
     function toggleVideoSelection(filename, cardEl) {
@@ -256,19 +372,35 @@
       if (selectedVideos.size === 0) return;
 
       selectedVideos.forEach(filename => {
-        const state = videoState.get(filename) || { nsfw: false, is_shorts: false };
+        const state = videoState.get(filename) || { nsfw: false, is_shorts: false, playlist: null };
         state.nsfw = !state.nsfw;
         videoState.set(filename, state);
         updateCardBadges(filename);
+        updateCardVisibility(filename);
       });
+      updateStats();
     }
 
     function toggleShorts() {
       if (selectedVideos.size === 0) return;
 
       selectedVideos.forEach(filename => {
-        const state = videoState.get(filename) || { nsfw: false, is_shorts: false };
+        const state = videoState.get(filename) || { nsfw: false, is_shorts: false, playlist: null };
         state.is_shorts = !state.is_shorts;
+        videoState.set(filename, state);
+        updateCardBadges(filename);
+        updateCardVisibility(filename);
+      });
+      updateStats();
+    }
+
+    function setPlaylist(playlist) {
+      if (selectedVideos.size === 0) return;
+
+      selectedVideos.forEach(filename => {
+        const state = videoState.get(filename) || { nsfw: false, is_shorts: false, playlist: null };
+        // Toggle off if same playlist, otherwise set new one
+        state.playlist = state.playlist === playlist ? null : playlist;
         videoState.set(filename, state);
         updateCardBadges(filename);
       });
@@ -278,7 +410,7 @@
       const card = document.querySelector(`.video-card[data-filename="${filename}"]`);
       if (!card) return;
 
-      const state = videoState.get(filename) || { nsfw: false, is_shorts: false };
+      const state = videoState.get(filename) || { nsfw: false, is_shorts: false, playlist: null };
       const badgesContainer = card.querySelector('.badges');
       badgesContainer.innerHTML = '';
 
@@ -295,12 +427,19 @@
         badge.textContent = 'SHORT';
         badgesContainer.appendChild(badge);
       }
+
+      if (state.playlist) {
+        const badge = document.createElement('span');
+        badge.className = 'badge playlist';
+        badge.textContent = state.playlist;
+        badgesContainer.appendChild(badge);
+      }
     }
 
     function copyJsonState() {
       const output = [];
       videoState.forEach((state, filename) => {
-        if (state.nsfw || state.is_shorts) {
+        if (state.nsfw || state.is_shorts || state.playlist) {
           output.push({
             filename,
             ...state
@@ -370,7 +509,8 @@
           savedState.forEach(item => {
             videoState.set(item.filename, {
               nsfw: item.nsfw || false,
-              is_shorts: item.is_shorts || false
+              is_shorts: item.is_shorts || false,
+              playlist: item.playlist || null
             });
           });
         }
@@ -405,13 +545,20 @@
 
         const observer = setupVideoObserver();
 
-        videos.reverse().forEach(video => {
+        // Sort by filename descending (newest first based on EFTA number)
+        const sortedVideos = [...videos].sort((a, b) => {
+          const filenameA = typeof a === 'string' ? a : a.filename;
+          const filenameB = typeof b === 'string' ? b : b.filename;
+          return filenameB.localeCompare(filenameA);
+        });
+
+        sortedVideos.forEach(video => {
           const filename = typeof video === 'string' ? video : video.filename;
           const videoUrl = getVideoUrl(filename);
 
           // Initialize state (preserve any loaded state)
           if (!videoState.has(filename)) {
-            videoState.set(filename, { nsfw: false, is_shorts: false });
+            videoState.set(filename, { nsfw: false, is_shorts: false, playlist: null });
           }
 
           const card = document.createElement('div');
@@ -469,6 +616,12 @@
             badge.textContent = 'SHORT';
             badgesDiv.appendChild(badge);
           }
+          if (state?.playlist) {
+            const badge = document.createElement('span');
+            badge.className = 'badge playlist';
+            badge.textContent = state.playlist;
+            badgesDiv.appendChild(badge);
+          }
 
           infoDiv.appendChild(filenameDiv);
           infoDiv.appendChild(badgesDiv);
@@ -482,6 +635,9 @@
 
         container.innerHTML = '';
         container.appendChild(grid);
+
+        // Update stats after loading
+        updateStats();
 
       } catch (error) {
         container.innerHTML = `<div class="error">Error loading videos: ${error.message}</div>`;

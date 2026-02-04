@@ -10,6 +10,7 @@ export interface Video {
   dislikes: number;
   hasThumbnail: boolean;
   is_shorts: boolean;
+  playlist: string | null;
 }
 
 export interface DataContextType {
