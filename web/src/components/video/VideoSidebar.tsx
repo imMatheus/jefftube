@@ -20,7 +20,7 @@ function SidebarVideoCard({ video }: SidebarVideoCardProps) {
     >
       <div className="relative w-40 shrink-0 aspect-video bg-(--color-bg-tertiary) rounded-lg overflow-hidden">
         <img
-          src={getThumbnailUrl(video.filename)}
+          src={getThumbnailUrl(video)}
           alt={video.title}
           className="w-full h-full object-cover"
         />

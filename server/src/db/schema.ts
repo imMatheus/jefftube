@@ -4,8 +4,9 @@ import { relations } from "drizzle-orm";
 export const videos = pgTable("videos", {
   id: uuid("id").primaryKey(),
   title: varchar("title", { length: 255 }),
-  filename: varchar("filename", { length: 255 }).notNull(),
+  filename: varchar("filename", { length: 255 }).notNull().unique(),
   length: integer("length").notNull(),
+  hasThumbnail: boolean("has_thumbnail").notNull().default(false),
   views: integer("views").notNull().default(0),
   likes: integer("likes").notNull().default(0),
   dislikes: integer("dislikes").notNull().default(0),

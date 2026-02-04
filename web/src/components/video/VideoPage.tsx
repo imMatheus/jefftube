@@ -44,7 +44,7 @@ export function VideoPage() {
         <meta property="og:title" content={`${video.title} - JTube`} />
         <meta property="og:description" content={`Watch ${video.title} on JTube`} />
         <meta property="og:type" content="video.other" />
-        <meta property="og:image" content={getThumbnailUrl(video.filename)} />
+        <meta property="og:image" content={getThumbnailUrl(video)} />
       </Helmet>
       <Header />
       <main className="pt-14 px-4">
@@ -53,7 +53,7 @@ export function VideoPage() {
           <div className="flex-1 min-w-0">
             <VideoPlayer
               src={getVideoUrl(video.filename)}
-              poster={getThumbnailUrl(video.filename)}
+              poster={getThumbnailUrl(video)}
             />
             <VideoInfo video={video} />
             <CommentSection videoId={video.id} />

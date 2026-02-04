@@ -21,7 +21,7 @@ export function VideoCard({
   showChannel = false,
   size = "md",
 }: VideoCardProps) {
-  const thumbnail = getThumbnailUrl(video.filename);
+  const thumbnail = getThumbnailUrl(video);
 
   return (
     <Link

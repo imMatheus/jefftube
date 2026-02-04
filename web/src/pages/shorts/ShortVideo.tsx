@@ -113,7 +113,7 @@ export function ShortVideo({ video, isActive }: ShortVideoProps) {
     setIsMuted(videoEl.muted);
   };
 
-  const thumbnailUrl = getThumbnailUrl(video.filename);
+  const thumbnailUrl = getThumbnailUrl(video);
 
   return (
     <div className="h-[calc(100vh-56px)] snap-start flex items-center justify-center px-4 sm:px-8 md:px-12 pt-4 sm:pt-8 pb-2 sm:pb-4">

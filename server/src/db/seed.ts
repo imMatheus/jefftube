@@ -7,6 +7,7 @@ interface VideoData {
   title: string | null;
   filename: string;
   length: string;
+  hasThumbnail: boolean;
 }
 
 // Convert time string (e.g., "59:22", "1:00:25") to seconds
@@ -43,6 +44,7 @@ async function seed() {
         title: video.title,
         filename: video.filename,
         length: parseTimeToSeconds(video.length),
+        hasThumbnail: video.hasThumbnail,
       }))
     );
     console.log(`Inserted ${Math.min(i + batchSize, videoData.length)}/${videoData.length} videos`);
