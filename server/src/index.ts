@@ -32,7 +32,6 @@ app.route("/api", videosRoutes);
 app.route("/api", commentsRoutes);
 app.route("/api", videoLikesRoutes);
 
-// 404 handler
 app.notFound((c) => {
   return c.json({ error: "Not found" }, 404);
 });
