@@ -4,11 +4,15 @@ import data from "../data.json";
 import videoState from "../video-state.json";
 
 interface VideoData {
-  id: string;
   title: string | null;
   filename: string;
   length: string;
   hasThumbnail: boolean;
+}
+
+// Extract ID from filename by removing the extension
+function getIdFromFilename(filename: string): string {
+  return filename.replace(/\.(mp4|mov)$/, "");
 }
 
 interface VideoStateEntry {
@@ -68,7 +72,7 @@ async function seed() {
       batch.map((video) => {
         const state = videoStateMap.get(video.filename);
         return {
-          id: video.id,
+          id: getIdFromFilename(video.filename),
           title: video.title,
           filename: video.filename,
           length: parseTimeToSeconds(video.length),

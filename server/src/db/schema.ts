@@ -2,7 +2,7 @@ import { pgTable, uuid, varchar, integer, text, timestamp, boolean, uniqueIndex 
 import { relations } from "drizzle-orm";
 
 export const videos = pgTable("videos", {
-  id: uuid("id").primaryKey(),
+  id: varchar("id", { length: 50 }).primaryKey(), // filename without extension (e.g., "EFTA01683563")
   title: varchar("title", { length: 255 }),
   filename: varchar("filename", { length: 255 }).notNull().unique(),
   length: integer("length").notNull(),
@@ -23,7 +23,7 @@ export const users = pgTable("users", {
 
 export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  videoId: uuid("video_id").notNull().references(() => videos.id, { onDelete: "cascade" }),
+  videoId: varchar("video_id", { length: 50 }).notNull().references(() => videos.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   parentId: uuid("parent_id"),
   content: text("content").notNull(),
@@ -42,7 +42,7 @@ export const commentLikes = pgTable("comment_likes", {
 
 export const videoLikes = pgTable("video_likes", {
   id: uuid("id").primaryKey().defaultRandom(),
-  videoId: uuid("video_id").notNull().references(() => videos.id, { onDelete: "cascade" }),
+  videoId: varchar("video_id", { length: 50 }).notNull().references(() => videos.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   isLike: boolean("is_like").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
