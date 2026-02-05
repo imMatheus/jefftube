@@ -20,6 +20,7 @@ interface VideoStateEntry {
   nsfw: boolean;
   is_shorts: boolean;
   playlist: string | null;
+  title: string | null;
 }
 
 // Create a lookup map from filename to video state
@@ -73,7 +74,7 @@ async function seed() {
         const state = videoStateMap.get(video.filename);
         return {
           id: getIdFromFilename(video.filename),
-          title: video.title,
+          title: state?.title ?? video.title,
           filename: video.filename,
           length: parseTimeToSeconds(video.length),
           hasThumbnail: video.hasThumbnail,

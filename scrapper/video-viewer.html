@@ -262,6 +262,26 @@
     .video-card.hidden {
       display: none;
     }
+
+    .btn-write-mode {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-write-mode:hover {
+      background-color: #2563eb;
+    }
+
+    .btn-write-mode.active {
+      background-color: #22c55e;
+    }
+
+    .video-card .title {
+      font-size: 13px;
+      color: #22c55e;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -274,6 +294,7 @@
       </div>
     </div>
     <button class="sticky-btn btn-hide" style="position:static" onclick="toggleHideTagged()">Hide NSFW/Shorts</button>
+    <button class="sticky-btn btn-write-mode" style="position:static" onclick="toggleWriteMode()">Write Mode: OFF</button>
   </div>
   <button class="sticky-btn btn-deselect" onclick="deselectAll()">Deselect All</button>
 
@@ -298,9 +319,10 @@
     const FALLBACK_THUMBNAIL = "https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/IDogLights2.JPG/250px-IDogLights2.JPG";
 
     // State management
-    const videoState = new Map(); // filename -> { nsfw: boolean, is_shorts: boolean, playlist: string|null }
+    const videoState = new Map(); // filename -> { nsfw: boolean, is_shorts: boolean, playlist: string|null, title: string|null }
     const selectedVideos = new Set(); // Set of filenames
     let hideTagged = false;
+    let writeMode = false;
 
     function getVideoUrl(filename) {
       return `${ASSETS_BASE_URL}/${filename}`;
@@ -339,6 +361,45 @@
           card.classList.toggle('hidden', hideTagged);
         }
       });
+    }
+
+    function toggleWriteMode() {
+      writeMode = !writeMode;
+      const btn = document.querySelector('.btn-write-mode');
+      btn.classList.toggle('active', writeMode);
+      btn.textContent = writeMode ? 'Write Mode: ON' : 'Write Mode: OFF';
+    }
+
+    function setVideoTitle(filename) {
+      const state = videoState.get(filename) || { nsfw: false, is_shorts: false, playlist: null, title: null };
+      const currentTitle = state.title || '';
+      const newTitle = prompt('Enter a title for this video:', currentTitle);
+
+      if (newTitle !== null) {
+        state.title = newTitle || null;
+        videoState.set(filename, state);
+        updateCardTitle(filename);
+      }
+    }
+
+    function updateCardTitle(filename) {
+      const card = document.querySelector(`.video-card[data-filename="${filename}"]`);
+      if (!card) return;
+
+      const state = videoState.get(filename);
+      let titleDiv = card.querySelector('.title');
+
+      if (state?.title) {
+        if (!titleDiv) {
+          titleDiv = document.createElement('div');
+          titleDiv.className = 'title';
+          const infoDiv = card.querySelector('.info');
+          infoDiv.insertBefore(titleDiv, infoDiv.firstChild);
+        }
+        titleDiv.textContent = state.title;
+      } else if (titleDiv) {
+        titleDiv.remove();
+      }
     }
 
     function updateCardVisibility(filename) {
@@ -439,7 +500,7 @@
     function copyJsonState() {
       const output = [];
       videoState.forEach((state, filename) => {
-        if (state.nsfw || state.is_shorts || state.playlist) {
+        if (state.nsfw || state.is_shorts || state.playlist || state.title) {
           output.push({
             filename,
             ...state
@@ -510,7 +571,8 @@
             videoState.set(item.filename, {
               nsfw: item.nsfw || false,
               is_shorts: item.is_shorts || false,
-              playlist: item.playlist || null
+              playlist: item.playlist || null,
+              title: item.title || null
             });
           });
         }
@@ -558,18 +620,23 @@
 
           // Initialize state (preserve any loaded state)
           if (!videoState.has(filename)) {
-            videoState.set(filename, { nsfw: false, is_shorts: false, playlist: null });
+            videoState.set(filename, { nsfw: false, is_shorts: false, playlist: null, title: null });
           }
 
           const card = document.createElement('div');
           card.className = 'video-card';
           card.dataset.filename = filename;
 
-          // Click to select
+          // Click to select or set title in write mode
           card.addEventListener('click', (e) => {
             // Don't select if clicking on video controls
             if (e.target.tagName === 'VIDEO') return;
-            toggleVideoSelection(filename, card);
+
+            if (writeMode) {
+              setVideoTitle(filename);
+            } else {
+              toggleVideoSelection(filename, card);
+            }
           });
 
           const videoEl = document.createElement('video');
@@ -621,6 +688,14 @@
             badge.className = 'badge playlist';
             badge.textContent = state.playlist;
             badgesDiv.appendChild(badge);
+          }
+
+          // Add title if exists
+          if (state?.title) {
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'title';
+            titleDiv.textContent = state.title;
+            infoDiv.appendChild(titleDiv);
           }
 
           infoDiv.appendChild(filenameDiv);
