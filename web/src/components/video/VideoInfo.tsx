@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import NumberFlow from "@number-flow/react";
 import { Avatar } from "../ui/Avatar";
 import { Button } from "../ui/Button";
 import {
@@ -59,8 +58,9 @@ export function VideoInfo({ video }: VideoInfoProps) {
             disabled={likeMutation.isPending}
           >
             <LikeIcon filled={isLiked} />
-            <NumberFlow value={video.likes}
-              style={{ width: Math.max(1, Math.ceil(video.likes / 10)) + 'ch' }} className="text-sm font-medium" />
+            <span className="text-sm font-medium">{video.likes}</span>
+            {/* <NumberFlow value={video.likes}
+              style={{ width: Math.max(1, Math.ceil(video.likes / 10)) + 'ch' }} className="text-sm font-medium" /> */}
           </button>
 
           {/* Share */}
