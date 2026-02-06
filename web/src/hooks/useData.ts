@@ -18,7 +18,6 @@ export interface DataContextType {
   randomSortedShorts: Video[];
   isLoading: boolean;
   error: Error | null;
-  trackView: (videoId: string) => Promise<void>;
 }
 
 export const DataContext = createContext<DataContextType | undefined>(undefined);

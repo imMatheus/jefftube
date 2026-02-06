@@ -1,7 +1,6 @@
-import { type ReactNode, useMemo, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { type ReactNode, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { DataContext, type Video } from '../hooks/useData';
-import { useCaptcha } from '../hooks/useCaptcha';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -23,8 +22,6 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const queryClient = useQueryClient();
-  const { getToken } = useCaptcha();
   const { data: videos = [], isLoading, error } = useQuery({
     queryKey: ['videos'],
     queryFn: fetchVideos,
@@ -49,29 +46,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       .filter((v): v is Video => v != null);
   }, [videos, shortsOrder]);
 
-  const trackView = useCallback(async (videoId: string) => {
-    try {
-      const captchaToken = await getToken("track_view");
-      const headers: Record<string, string> = {};
-      if (captchaToken) headers["X-Recaptcha-Token"] = captchaToken;
-      const response = await fetch(`${API_URL}/api/videos/${videoId}/view`, {
-        method: 'POST',
-        headers,
-      });
-      if (response.ok) {
-        const { views } = await response.json();
-        // Update the video's view count in the cache
-        queryClient.setQueryData<Video[]>(['videos'], (oldVideos) =>
-          oldVideos?.map((v) => (v.id === videoId ? { ...v, views } : v))
-        );
-      }
-    } catch (err) {
-      console.error('Failed to track view:', err);
-    }
-  }, [queryClient, getToken]);
-
   return (
-    <DataContext.Provider value={{ videos, randomSortedShorts, isLoading, error, trackView }}>
+    <DataContext.Provider value={{ videos, randomSortedShorts, isLoading, error }}>
       {children}
     </DataContext.Provider>
   );

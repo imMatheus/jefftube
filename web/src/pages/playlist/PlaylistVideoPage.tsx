@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { useParams, Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { Header } from "../../components/layout/Header";
@@ -120,21 +119,12 @@ function PlaylistSidebar({ playlistId, playlistName, videos, currentVideoId }: P
 
 export function PlaylistVideoPage() {
   const { playlistId, videoId } = useParams<{ playlistId: string; videoId: string }>();
-  const { videos, trackView } = useData();
-  const trackedVideoId = useRef<string | null>(null);
+  const { videos } = useData();
 
   // Get all videos in this playlist
   const playlistVideos = videos.filter((v) => v.playlist === playlistId);
   const video = videos.find((v) => v.id === videoId);
   const playlistName = playlistId ? formatPlaylistName(playlistId) : "";
-
-  // Track view when video page is loaded (only once per video)
-  useEffect(() => {
-    if (videoId && trackedVideoId.current !== videoId) {
-      trackedVideoId.current = videoId;
-      trackView(videoId);
-    }
-  }, [videoId, trackView]);
 
   if (!video || playlistVideos.length === 0) {
     return (
