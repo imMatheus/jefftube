@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, desc, eq, sql, isNull } from "drizzle-orm";
+import { and, eq, sql, isNull, desc } from "drizzle-orm";
 import { db } from "../db";
 import { comments, commentLikes, users } from "../db/schema";
 import { getClientIp, getOrCreateUser } from "./users";
@@ -12,7 +12,7 @@ commentsRoutes.get("/videos/:videoId/comments", async (c) => {
   const ip = getClientIp(c.req.raw);
   const currentUser = await getOrCreateUser(ip);
 
-  // Get all top-level comments (no parent)
+  // Get 100 newest top-level comments
   const topLevelComments = await db
     .select({
       id: comments.id,
@@ -25,7 +25,8 @@ commentsRoutes.get("/videos/:videoId/comments", async (c) => {
     .from(comments)
     .innerJoin(users, eq(comments.userId, users.id))
     .where(and(eq(comments.videoId, videoId), isNull(comments.parentId)))
-    .orderBy(desc(comments.createdAt));
+    .orderBy(desc(comments.createdAt))
+    .limit(100);
 
   // Get all replies
   const allReplies = await db

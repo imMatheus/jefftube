@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   useComments,
   useCurrentUser,
@@ -7,7 +6,6 @@ import {
 import { Comment } from "./Comment";
 import { CommentInput } from "./CommentInput";
 import { formatViews } from "../../utils";
-import { SortIcon } from "../icons";
 
 interface CommentSectionProps {
   videoId: string;
@@ -17,7 +15,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   const { data, isLoading } = useComments(videoId);
   const { data: currentUser } = useCurrentUser();
   const postComment = usePostComment(videoId);
-  const [sortBy, setSortBy] = useState<"top" | "newest">("top");
 
   const handleSubmitComment = async (content: string) => {
     await postComment.mutateAsync({ content });
@@ -48,14 +45,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
   const comments = data?.comments || [];
   const totalCount = data?.totalCount || 0;
 
-  // Sort comments
-  const sortedComments = [...comments].sort((a, b) => {
-    if (sortBy === "top") {
-      return b.likes - a.likes;
-    }
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-
   return (
     <div className="py-6">
       {/* Header */}
@@ -63,13 +52,6 @@ export function CommentSection({ videoId }: CommentSectionProps) {
         <h2 className="text-xl font-bold text-(--color-text-primary)">
           {formatViews(totalCount)} Comments
         </h2>
-        <button
-          className="flex cursor-pointer items-center gap-2 text-sm"
-          onClick={() => setSortBy(sortBy === "top" ? "newest" : "top")}
-        >
-          <SortIcon />
-          <span className="text-(--color-text-secondary) hover:text-(--color-text-primary)">Sort by: {sortBy === "top" ? "Top comments" : "Newest first"}</span>
-        </button>
       </div>
 
       {/* Comment input */}
@@ -85,7 +67,7 @@ export function CommentSection({ videoId }: CommentSectionProps) {
 
       {/* Comments list */}
       <div className="mt-6 space-y-4">
-        {sortedComments.map((comment) => (
+        {comments.map((comment) => (
           <Comment key={comment.id} comment={comment} videoId={videoId} />
         ))}
       </div>
