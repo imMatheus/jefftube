@@ -1,0 +1,2 @@
+CREATE INDEX "comments_video_parent_created" ON "comments" USING btree ("video_id","parent_id","created_at");--> statement-breakpoint
+CREATE INDEX "comments_video_user_created" ON "comments" USING btree ("video_id","user_id","created_at");

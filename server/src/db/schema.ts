@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, integer, text, timestamp, boolean, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, integer, text, timestamp, boolean, uniqueIndex, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const videos = pgTable("videos", {
@@ -27,7 +27,10 @@ export const comments = pgTable("comments", {
   parentId: uuid("parent_id"),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("comments_video_parent_created").on(table.videoId, table.parentId, table.createdAt),
+  index("comments_video_user_created").on(table.videoId, table.userId, table.createdAt),
+]);
 
 export const commentLikes = pgTable("comment_likes", {
   id: uuid("id").primaryKey().defaultRandom(),
