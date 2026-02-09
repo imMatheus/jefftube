@@ -6,6 +6,12 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
+
+ARG VITE_API_URL
+ARG VITE_RECAPTCHA_SITE_KEY
+ARG VITE_PUBLIC_POSTHOG_KEY
+ARG VITE_PUBLIC_POSTHOG_HOST
+
 RUN bun run build
 
 FROM oven/bun:1-alpine
